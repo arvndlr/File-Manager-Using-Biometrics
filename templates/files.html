@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Management</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='files.css') }}"
+    />
+    <style>
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+      }
+
+      .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 400px;
+        max-height: 400px;
+      }
+
+      .close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+      <a
+        href="{{ url_for('home') }}"
+        class="{% if active_page == 'home' %}active{% endif %}"
+        >🏠 Home</a
+      >
+      <a
+        href="{{ url_for('history') }}"
+        class="{% if active_page == 'history' %}active{% endif %}"
+        >📜 History</a
+      >
+      <a
+        href="{{ url_for('users') }}"
+        class="{% if active_page == 'users' %}active{% endif %}"
+        >👥 User Management</a
+      >
+      <a
+        href="{{ url_for('files') }}"
+        class="{% if active_page == 'files' %}active{% endif %}"
+        >📄 File Management</a
+      >
+      <a
+        href="{{ url_for('logout') }}"
+        class="{% if active_page == 'logout' %}active{% endif %}"
+        >🚪 Logout</a
+      >
+    </div>
+
+    <div class="main-content">
+      <div class="top-bar">
+        <h3>File Management</h3>
+        <p>Welcome, {{ username }}!</p>
+      </div>
+
+      <div class="dashboard-section">
+        <h2>📄 Manage Files</h2>
+        <p>Here you can add, edit, and remove files from the system.</p>
+
+        <!-- File Upload Form -->
+        <form action="{{ url_for('files') }}" method="POST">
+          <input type="hidden" name="file_id" id="file_id" />
+          <label for="name">File Name:</label>
+          <input type="text" name="name" id="name" required />
+
+          <label for="file_type">File Type:</label>
+          <select name="file_type" id="file_type">
+            <option value="PDF">PDF</option>
+            <option value="DOCX">DOCX</option>
+            <option value="TXT">TXT</option>
+            <option value="IMG">Image</option>
+          </select>
+
+          <button type="submit" name="action" value="Create">
+            Upload File
+          </button>
+          <button type="submit" name="action" value="Edit">Update File</button>
+        </form>
+      </div>
+
+      <!-- File List -->
+      <div class="file-list">
+        <h3>Uploaded Files</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>QR Code</th>
+              <th>Date Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for file in files %}
+            <tr>
+              <td>{{ file[1] }}</td>
+              <td>{{ file[2] }}</td>
+              <td>
+                <!-- QR Code Image Link -->
+                <a
+                  href="javascript:void(0);"
+                  onclick="showModal('{{ file[3] }}')"
+                >
+                  <img src="{{ file[3] }}" alt="QR Code" width="50" />
+                </a>
+              </td>
+              <td>{{ file[4] }}</td>
+              <td>
+                <form action="{{ url_for('files') }}" method="POST">
+                  <input type="hidden" name="file_id" value="{{ file[0] }}" />
+                  <input type="hidden" name="name" value="{{ file[1] }}" />
+                  <input type="hidden" name="file_type" value="{{ file[2] }}" />
+                  <button type="submit" name="action" value="Edit">Edit</button>
+                  <button type="submit" name="action" value="Delete">
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal for displaying full QR code image -->
+    <div id="qrModal" class="modal">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img class="modal-content" id="modalImage" />
+    </div>
+
+    <script>
+      // Function to display the modal with the QR code image
+      function showModal(qrCodeSrc) {
+        var modal = document.getElementById("qrModal");
+        var modalImage = document.getElementById("modalImage");
+        modal.style.display = "block";
+        modalImage.src = qrCodeSrc;
+      }
+
+      // Function to close the modal
+      function closeModal() {
+        var modal = document.getElementById("qrModal");
+        modal.style.display = "none";
+      }
+    </script>
+  </body>
+</html>

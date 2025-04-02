@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='home.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+      <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}active{% endif %}">🏠 Home</a>
+        <a href="{{ url_for('history') }}" class="{% if active_page == 'history' %}active{% endif %}">📜 History</a>
+        <a href="{{ url_for('users') }}" class="{% if active_page == 'users' %}active{% endif %}">👥 User Management</a>
+        <a href="{{ url_for('files') }}" class="{% if active_page == 'files' %}active{% endif %}">📄 File Management</a>
+        <a href="{{ url_for('logout') }}" class="{% if active_page == 'logout' %}active{% endif %}">🚪 Logout</a>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <div class="top-bar">
+        <h3>Welcome, {{ username }}!</h3>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
+
+      <div class="dashboard-section">
+        <h2>📊 Dashboard Overview</h2>
+        <p>
+          Select an option from the sidebar to manage history, users, or books.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

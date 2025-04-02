@@ -1,0 +1,81 @@
+@import url("home.css");
+
+.container {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+}
+
+.navbar {
+  background-color: #007bff;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.logout-btn {
+  color: white;
+  text-decoration: none;
+  background-color: red;
+  padding: 10px 15px;
+  border-radius: 5px;
+}
+
+.logout-btn:hover {
+  background-color: darkred;
+}
+
+.content {
+  background: white;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+}
+
+.borrow-btn,
+.return-btn {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.borrow-btn:hover {
+  background-color: darkgreen;
+}
+
+.return-btn {
+  background-color: orange;
+}
+
+.return-btn:hover {
+  background-color: darkorange;
+}

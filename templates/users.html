@@ -1,0 +1,110 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>User Management</title>
+        <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='users.css') }}"
+        />
+    </head>
+    <body>
+        <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a
+            href="{{ url_for('home') }}"
+            class="{% if active_page == 'home' %}active{% endif %}"
+            >🏠 Home</a
+        >
+        <a
+            href="{{ url_for('history') }}"
+            class="{% if active_page == 'history' %}active{% endif %}"
+            >📜 History</a
+        >
+        <a
+            href="{{ url_for('users') }}"
+            class="{% if active_page == 'users' %}active{% endif %}"
+            >👥 User Management</a
+        >
+        <a
+            href="{{ url_for('files') }}"
+            class="{% if active_page == 'files' %}active{% endif %}"
+            >📄 File Management</a
+        >
+        <a
+            href="{{ url_for('logout') }}"
+            class="{% if active_page == 'logout' %}active{% endif %}"
+            >🚪 Logout</a
+        >
+        </div>
+
+        <div class="main-content">
+        <div class="top-bar">
+            <h3>User Management</h3>
+            <p>Welcome, {{ username }}!</p>
+        </div>
+        <div class="dashboard-section">
+            <h2>👥 Manage Users</h2>
+            <p>Here you can add, edit, and remove users.</p>
+            <!-- Form to Create User -->
+            <form action="{{ url_for('users') }}" method="POST" class="create-form">
+                <h3>Create New User</h3>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            
+                <label for="role">Role:</label>
+                <select name="role" id="role">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            
+                <button type="submit" name="action" value="Create">Create User</button>
+            </form>
+            
+
+            <!-- User Table -->
+            <h3>Existing Users</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user[1] }}</td>
+                        <td>{{ user[2] }}</td>
+                        <td>
+                            <!-- Edit User Form (Inline) -->
+                <form action="{{ url_for('users') }}" method="POST" class="edit-form">
+                    <input type="hidden" name="user_id" value="{{ user[0] }}">
+                    <input type="text" name="username" value="{{ user[1] }}" required>
+                    <input type="password" name="password" placeholder="New Password">
+                    <select name="role">
+                        <option value="user" {% if user[2] == 'user' %}selected{% endif %}>User</option>
+                        <option value="admin" {% if user[2] == 'admin' %}selected{% endif %}>Admin</option>
+                    </select>
+                    <button type="submit" name="action" value="Edit">Edit</button>
+                </form>
+                
+                <!-- Delete User Button -->
+                <form action="{{ url_for('delete_user', user_id=user[0]) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                </form>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </body>
+    </html>

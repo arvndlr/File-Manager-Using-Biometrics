@@ -1,0 +1,155 @@
+@import url("home.css"); /* Use shared layout */
+
+/* User Management Customizations */
+.dashboard-section h2 {
+  color: #d2232a; /* Red Title */
+}
+/* Create Form - Display as Block */
+.create-form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
+}
+
+.create-form input,
+.create-form select,
+.create-form button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+}
+
+.create-form button {
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
+}
+
+.create-form button:hover {
+  background-color: #45a049;
+}
+
+/* Edit Form - Inline Display */
+.edit-form {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.edit-form input,
+.edit-form select {
+  width: 120px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+
+.edit-form button {
+  padding: 5px 10px;
+  background-color: #2196f3;
+  color: white;
+  border-radius: 5px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.edit-form button:hover {
+  background-color: #1976d2;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+  padding: 12px 15px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Delete Button */
+.delete-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+  padding: 12px 20px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  text-align: center;
+}
+
+table td {
+  text-align: center;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Button Styling for Actions */
+button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-right: 5px;
+  font-size: 0.9em;
+}
+
+button:hover {
+  background-color: #d32f2f;
+}

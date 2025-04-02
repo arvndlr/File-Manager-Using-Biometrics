@@ -1,0 +1,97 @@
+/* Reset styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Layout */
+body {
+  display: flex;
+  height: 100vh;
+  background-color: #f99f1e; /* Warm Orange Background */
+  overflow: hidden; /* Prevents the full page from scrolling */
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  width: 250px;
+  background: #d2232a; /* Red Sidebar */
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Allows scrolling inside the sidebar if content is large */
+}
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+/* Sidebar Links */
+.sidebar a {
+  text-decoration: none;
+  color: white;
+  padding: 12px;
+  display: block;
+  margin: 5px 0;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+/* Active Link */
+.sidebar a.active {
+  background-color: #f99f1e; /* Orange Active Link */
+  font-weight: bold;
+}
+
+/* Sidebar Link Hover Effect */
+.sidebar a:hover {
+  background: #f99f1e; /* Orange Hover */
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background: white;
+  overflow-y: auto; /* Enables scrolling in the content */
+}
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0893dbff; /* celestial-blue */
+  padding: 15px;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar a {
+  text-decoration: none;
+  color: white;
+}
+
+/* Dashboard Section */
+.dashboard-section {
+  margin-top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section h2 {
+  color: #d2232a; /* Red Titles */
+  margin-bottom: 10px;
+}
+
+.dashboard-section p {
+  font-size: 16px;
+  color: #555;
+}
