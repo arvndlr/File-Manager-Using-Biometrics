@@ -51,12 +51,11 @@
     </style>
   </head>
   <body>
+    <nav class="navbar">
+      <h2>📄 File Borrowing System</h2>
+      <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
+    </nav>
     <div class="container">
-      <nav class="navbar">
-        <h2>📄 File Borrowing System</h2>
-        <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
-      </nav>
-
       <div class="content">
         <h3>Available Files</h3>
         <table>

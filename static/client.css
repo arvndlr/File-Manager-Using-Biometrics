@@ -1,15 +1,28 @@
 @import url("home.css");
 
+body {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  background-color: #f99f1e; /* Warm Orange Background */
+  overflow: hidden; /* Prevents the full page from scrolling */
+}
 .container {
   width: 80%;
   margin: auto;
   padding: 20px;
+  height: 90vh;
+  overflow: hidden;
+  overflow-y: auto;
 }
-
+.container::-webkit-scrollbar {
+  display: none;
+}
 .navbar {
   background-color: #007bff;
   color: white;
-  padding: 15px;
+  padding-inline: 30px;
+  padding-block: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
