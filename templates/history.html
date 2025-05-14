@@ -57,42 +57,38 @@
         <p>Here you can view all past transactions and records.</p>
 
         <!-- Transaction History Table -->
-        <table>
-          <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>File Name</th>
-              <th>Borrower Name</th>
-              <th>Borrow Date</th>
-              <th>Return Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for transaction in history %}
-            <tr>
-              <td>{{ transaction[0] }}</td>
-              <!-- Transaction ID -->
-              <td>{{ transaction[1] }}</td>
-              <!-- File Name -->
-              <td>{{ transaction[2] }}</td>
-              <!-- Borrower Name -->
-              <td>{{ transaction[3] }}</td>
-              <!-- Borrow Date -->
-              <td>
-                {{ transaction[4] if transaction[4] else 'Not Returned' }}
-              </td>
-              <!-- Return Date -->
-              <td
-                class="{{ 'returned' if transaction[5] == 'Returned' else 'borrowed' }}"
-              >
-                {{ transaction[5] }}
-              </td>
-              <!-- Status -->
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>File Name</th>
+                <th>Borrower Name</th>
+                <th>Borrow Date</th>
+                <th>Return Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for transaction in history %}
+              <tr>
+                <td>{{ transaction[0] }}</td>
+                <td>{{ transaction[1] }}</td>
+                <td>{{ transaction[2] }}</td>
+                <td>{{ transaction[3] }}</td>
+                <td>
+                  {{ transaction[4] if transaction[4] else 'Not Returned' }}
+                </td>
+                <td
+                  class="{{ 'returned' if transaction[5] == 'Returned' else 'borrowed' }}"
+                >
+                  {{ transaction[5] }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </body>

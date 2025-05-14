@@ -51,3 +51,23 @@ tbody tr:hover {
   color: #964b00;
   font-weight: bold;
 }
+.table-container {
+  max-height: 400px; /* adjust this height as needed */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  margin-top: 1rem;
+}
+
+/* Optional: keep header fixed while scrolling */
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+  z-index: 1;
+}
+
