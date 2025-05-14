@@ -2,7 +2,7 @@
 
 /* User Management Customizations */
 .dashboard-section h2 {
-  color: #d2232a; /* Red Title */
+  color: var(--gunmetal); /* Red Title */
 }
 /* Create Form - Display as Block */
 .create-form {
@@ -25,13 +25,15 @@
 }
 
 .create-form button {
-  background-color: #4caf50;
+  background-color: var(--red);
   color: white;
   cursor: pointer;
 }
-
-.create-form button:hover {
+#fingerprint {
   background-color: #45a049;
+}
+.create-form button:hover {
+  background-color: var(--red);
 }
 
 /* Edit Form - Inline Display */

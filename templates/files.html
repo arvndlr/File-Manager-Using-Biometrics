@@ -52,31 +52,36 @@
   </head>
   <body>
     <div class="sidebar">
-      <h2>Dashboard</h2>
+      <div class="sidebar-header">
+        <h2>BSU - TNEU</h2>
+        <img src="../static/images/bsu-logo.png" alt="QR Code" width="40" />
+        <p>File Management System</p>
+      </div>
+      <br />
       <a
         href="{{ url_for('home') }}"
         class="{% if active_page == 'home' %}active{% endif %}"
-        >🏠 Home</a
+        >Home</a
       >
       <a
         href="{{ url_for('history') }}"
         class="{% if active_page == 'history' %}active{% endif %}"
-        >📜 History</a
+        >History</a
       >
       <a
         href="{{ url_for('users') }}"
         class="{% if active_page == 'users' %}active{% endif %}"
-        >👥 User Management</a
+        >User Management</a
       >
       <a
         href="{{ url_for('files') }}"
         class="{% if active_page == 'files' %}active{% endif %}"
-        >📄 File Management</a
+        >File Management</a
       >
       <a
         href="{{ url_for('logout') }}"
         class="{% if active_page == 'logout' %}active{% endif %}"
-        >🚪 Logout</a
+        >Logout</a
       >
     </div>
 
@@ -87,7 +92,10 @@
       </div>
 
       <div class="dashboard-section">
-        <h2>📄 Manage Files</h2>
+        <h2>
+          <img src="../static/icons/folder.png" alt="user icon" width="30px" />
+          Manage Files
+        </h2>
         <p>Here you can add, edit, and remove files from the system.</p>
 
         <!-- File Upload Form -->
@@ -156,7 +164,15 @@
         </table>
       </div>
     </div>
-
+    <!--<form
+      action="{{ url_for('compare_qr') }}"
+      method="POST"
+      enctype="multipart/form-data"
+    >
+      <label for="qr_image">Upload QR Code to Compare:</label>
+      <input type="file" name="qr_image" accept="image/*" required />
+      <button type="submit">Compare QR</button>
+    </form>-->
     <!-- Modal for displaying full QR code image -->
     <div id="qrModal" class="modal">
       <span class="close" onclick="closeModal()">&times;</span>

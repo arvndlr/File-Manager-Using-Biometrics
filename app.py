@@ -1,4 +1,13 @@
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import (
+    Flask,
+    jsonify,
+    render_template,
+    request,
+    redirect,
+    session,
+    url_for,
+    flash,
+)
 from flask_bcrypt import Bcrypt
 from flask_login import (
     LoginManager,
@@ -8,12 +17,14 @@ from flask_login import (
     logout_user,
     current_user,
 )
+from datetime import datetime
 import psycopg2
 import qrcode
 import io
 import os
 import base64
 from database import get_db_connection
+from utils import decode_qr_code
 from config import SECRET_KEY
 
 app = Flask(__name__)
@@ -72,6 +83,26 @@ def generate_qr_code(data):
 
     # Return the URL to the saved QR code image
     return url_for("static", filename=f"qrcodes/{img_filename}")
+
+
+@app.route("/compare_qr", methods=["POST"])
+def compare_qr():
+    uploaded_file = request.files["qr_image"]
+    uploaded_path = os.path.join("static/temp", uploaded_file.filename)
+    uploaded_file.save(uploaded_path)
+
+    uploaded_content = decode_qr_code(uploaded_path)
+
+    # Loop through existing QR codes in /static/qrcodes
+    qr_dir = os.path.join("static", "qrcodes")
+    for filename in os.listdir(qr_dir):
+        file_path = os.path.join(qr_dir, filename)
+        existing_content = decode_qr_code(file_path)
+
+        if uploaded_content and uploaded_content == existing_content:
+            return f"Match found with {filename}"
+
+    return "No match found"
 
 
 @app.route("/")
@@ -199,54 +230,137 @@ def history():
 @app.route("/users", methods=["GET", "POST"])
 @login_required
 def users():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
     if request.method == "POST":
         if request.form.get("action") == "Create":
             # Handle create user
             username = request.form["username"]
-            password = request.form["password"]
-            role = request.form["role"]  # Add role from the form
-            hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-            conn = get_db_connection()
-            cur = conn.cursor()
+            address = request.form["address"]
+            phone = request.form["phone"]
+            to_borrow = request.form.get("to_borrow")  # Get selected file
+            slot_number = request.form.get("slot_number")  # ✅ Get selected slot_number
+
+            # Check if selected slot is available
             cur.execute(
-                "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)",
-                (username, hashed_password, role),
+                "SELECT is_available FROM user_slots WHERE slot_number = %s",
+                (slot_number,),
             )
+            slot = cur.fetchone()
+
+            if not slot or not slot[0]:
+                flash(
+                    f"Slot {slot_number} is already taken. Please choose another.",
+                    "error",
+                )
+                return redirect(url_for("users"))
+
+            cur.execute(
+                """
+            INSERT INTO users 
+            (username, address, phone, to_borrow, slot_number)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+                (
+                    username,
+                    address,
+                    phone,
+                    to_borrow,
+                    slot_number,
+                ),
+            )
+
+            # Mark the slot as unavailable
+            cur.execute(
+                "UPDATE user_slots SET is_available = FALSE WHERE slot_number = %s",
+                (slot_number,),
+            )
+            cur.execute("SELECT id FROM files WHERE name = %s", (to_borrow,))
+            file = cur.fetchone()
+            if file:
+                file_id = file[0]
+                cur.execute(
+                    """
+                INSERT INTO transactions (file_id, borrower_name, borrow_date, status, file_name)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                    (file_id, username, datetime.now(), "Borrowed", to_borrow),
+                )
             conn.commit()
-            cur.close()
-            conn.close()
             flash("User created successfully!", "success")
             return redirect(url_for("users"))
-        elif request.form.get("action") == "Edit":
-            # Handle edit user
-            user_id = request.form["user_id"]
-            username = request.form["username"]
-            password = request.form["password"]
-            role = request.form["role"]  # Handle role change
-            hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute(
-                "UPDATE users SET username = %s, password = %s, role = %s WHERE id = %s",
-                (username, hashed_password, role, user_id),
-            )
-            conn.commit()
-            cur.close()
-            conn.close()
-            flash("User updated successfully!", "success")
-            return redirect(url_for("users"))
 
-    # Get all users to display in table
-    conn = get_db_connection()
-    cur = conn.cursor()
+    # GET method - display users and file options
     cur.execute("SELECT id, username, role FROM users")
     users = cur.fetchall()
+
+    cur.execute(
+        """
+    SELECT id, name
+    FROM files
+    WHERE name NOT IN (
+        SELECT to_borrow FROM users WHERE to_borrow IS NOT NULL AND to_borrow != ''
+    )
+    """
+    )  # Get list of files
+    file_options = cur.fetchall()
+    cur.execute(
+        "SELECT slot_number FROM user_slots WHERE is_available = TRUE ORDER BY slot_number ASC"
+    )
+    available_slots = cur.fetchall()
+
     cur.close()
     conn.close()
 
     return render_template(
-        "users.html", active_page="users", username=current_user.username, users=users
+        "users.html",
+        active_page="users",
+        username=current_user.username,
+        users=users,
+        file_options=file_options,
+        available_slots=available_slots,
     )
+
+
+@app.route("/enroll_fingerprint", methods=["POST"])
+def enroll_fingerprint():
+    try:
+        from pyfingerprint.pyfingerprint import PyFingerprint
+
+        f = PyFingerprint("/dev/ttyUSB0", 57600, 0xFFFFFFFF, 0x00000000)
+        if not f.verifyPassword():
+            return jsonify(success=False)
+
+        if f.readImage():
+            f.convertImage(0x01)
+
+            result = f.searchTemplate()
+            positionNumber = result[0]
+
+            if positionNumber >= 0:
+                return jsonify(success=False)
+
+            f.createTemplate()
+            positionNumber = f.storeTemplate()
+
+            return jsonify(success=True, fingerprint_id=positionNumber)
+    except Exception as e:
+        print("Error:", e)
+        return jsonify(success=False)
+
+
+@app.route("/api/fingerprint", methods=["POST"])
+def fingerprint_api():
+    data = request.get_json()
+    finger_id = data.get("finger_id")
+
+    if finger_id is not None:
+        # You can log this, update a DB, etc.
+        print(f"Received fingerprint match ID: {finger_id}")
+        return jsonify({"message": "Fingerprint received", "id": finger_id}), 200
+    else:
+        return jsonify({"error": "No fingerprint ID provided"}), 400
 
 
 # Route to delete a user
@@ -274,7 +388,7 @@ def files():
         if action == "Create":
             name = request.form["name"]
             file_type = request.form["file_type"]
-            qr_code = generate_qr_code(name + "-" + file_type)
+            qr_code = generate_qr_code(name)
 
             cur.execute(
                 "INSERT INTO files (name, file_type, qr_code, date_created) VALUES (%s, %s, %s, NOW())",
@@ -287,7 +401,7 @@ def files():
             file_id = request.form["file_id"]
             name = request.form["name"]
             file_type = request.form["file_type"]
-            qr_code = generate_qr_code(name + "-" + file_type)
+            qr_code = generate_qr_code(name)
 
             cur.execute(
                 "UPDATE files SET name = %s, file_type = %s, qr_code = %s WHERE id = %s",
@@ -362,6 +476,78 @@ def return_file():
     return redirect(url_for("client_files"))
 
 
+@app.route("/api/check_borrow", methods=["GET"])
+def check_borrow():
+    book_name = request.args.get("book_name")
+    if not book_name:
+        return jsonify({"error": "Missing book_name"}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Find user who borrowed the book
+    cur.execute("SELECT * FROM users WHERE to_borrow = %s", (book_name,))
+    user = cur.fetchone()
+
+    if user:
+        user_id = user[0]  # Assuming 'id' is the first column in 'users'
+        username = user[1]  # Assuming 'username' is the second column
+        slot_number = user[5]  # Assuming 'slot_number' is the sixth column
+        # Set return date to current timestamp
+        return_date = datetime.now()
+        # Update transaction status to "Returned"
+        # Update the transaction to mark it as Returned and set return_date
+        cur.execute(
+            """
+            UPDATE transactions
+            SET status = 'Returned',
+                return_date = %s
+            WHERE borrower_name = %s AND status = 'Borrowed'
+        """,
+            (return_date, username),
+        )
+
+        # Mark the slot as available again
+        cur.execute(
+            """
+            UPDATE user_slots
+            SET is_available = TRUE
+            WHERE slot_number = %s
+        """,
+            (slot_number,),
+        )
+
+        # Delete the user from the users table
+        cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return "found"
+    else:
+        cur.close()
+        conn.close()
+        return "not_found"
+
+
+@app.route("/api/check_slot/<int:slot_number>", methods=["GET"])
+def check_slot(slot_number):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT is_available FROM user_slots WHERE slot_number = %s AND is_available=true", (slot_number,)
+    )
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if result is not None:
+        return "is_available"
+    else:
+        return "is_not_available"
+
+
 @app.route("/client_files")
 @login_required
 def client_files():
@@ -397,4 +583,4 @@ def client_files():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

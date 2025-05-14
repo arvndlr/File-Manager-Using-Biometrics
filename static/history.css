@@ -2,7 +2,7 @@
 
 /* History Page Customizations */
 .dashboard-section h2 {
-  color: #f99f1e; /* Orange Title */
+  color: var(--gunmetal); /* Orange Title */
 }
 
 /* Table Styling */
@@ -24,8 +24,8 @@ td {
 }
 
 th {
-  background-color: #333;
-  color: white;
+  background-color: var(--white-smoke);
+  color: var(--gunmetal);
 }
 
 tbody tr:nth-child(even) {
@@ -38,19 +38,16 @@ tbody tr:hover {
 
 /* Status Styles */
 .returned {
-  background-color: #4caf50;
-  color: white;
+  color: #4caf50;
   font-weight: bold;
 }
 
 .overdue {
-  background-color: #d2232a;
   color: white;
   font-weight: bold;
 }
 
 .borrowed {
-  background-color: #ffa500;
-  color: white;
+  color: #964b00;
   font-weight: bold;
 }

@@ -11,31 +11,36 @@
   </head>
   <body>
     <div class="sidebar">
-      <h2>Dashboard</h2>
+      <div class="sidebar-header">
+        <h2>BSU - TNEU</h2>
+        <img src="../static/images/bsu-logo.png" alt="QR Code" width="40" />
+        <p>File Management System</p>
+      </div>
+      <br />
       <a
         href="{{ url_for('home') }}"
         class="{% if active_page == 'home' %}active{% endif %}"
-        >🏠 Home</a
+        >Home</a
       >
       <a
         href="{{ url_for('history') }}"
         class="{% if active_page == 'history' %}active{% endif %}"
-        >📜 History</a
+        >History</a
       >
       <a
         href="{{ url_for('users') }}"
         class="{% if active_page == 'users' %}active{% endif %}"
-        >👥 User Management</a
+        >User Management</a
       >
       <a
         href="{{ url_for('files') }}"
         class="{% if active_page == 'files' %}active{% endif %}"
-        >📄 File Management</a
+        >File Management</a
       >
       <a
         href="{{ url_for('logout') }}"
         class="{% if active_page == 'logout' %}active{% endif %}"
-        >🚪 Logout</a
+        >Logout</a
       >
     </div>
 
@@ -45,7 +50,10 @@
         <p>Welcome, {{ username }}!</p>
       </div>
       <div class="dashboard-section">
-        <h2>📜 Transaction History</h2>
+        <h2>
+          <img src="../static/icons/history.png" alt="user icon" width="30px" />
+          Transaction History
+        </h2>
         <p>Here you can view all past transactions and records.</p>
 
         <!-- Transaction History Table -->
