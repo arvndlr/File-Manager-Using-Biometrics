@@ -23,6 +23,8 @@ import qrcode
 import io
 import os
 import base64
+import random  # Add this at the top
+import string  # Add this for alphanumeric OTPs (optional)
 from database import get_db_connection
 from utils import decode_qr_code
 from config import SECRET_KEY
@@ -53,7 +55,8 @@ def load_user(user_id):
         return User(user[0], user[1], user[2])  # Return role as well
     return None
 
-
+def generate_otp(length=4):
+    return ''.join(random.choices(string.digits, k=length))
 # Define the path for QR code images
 QR_CODE_DIR = os.path.join("static", "qrcodes")
 
@@ -63,14 +66,15 @@ if not os.path.exists(QR_CODE_DIR):
 
 
 # Function to generate QR code and save it as an image file
-def generate_qr_code(data):
+def generate_qr_code(data, author, date_created):
+    qr_content = f"{data},{author},{date_created}"
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=10,
         border=4,
     )
-    qr.add_data(data)
+    qr.add_data(qr_content)
     qr.make(fit=True)
 
     # Create an image of the QR code
@@ -230,9 +234,10 @@ def history():
 @app.route("/users", methods=["GET", "POST"])
 @login_required
 def users():
+    otp = request.args.get("otp")
     conn = get_db_connection()
     cur = conn.cursor()
-
+    
     if request.method == "POST":
         if request.form.get("action") == "Create":
             # Handle create user
@@ -241,6 +246,8 @@ def users():
             phone = request.form["phone"]
             to_borrow = request.form.get("to_borrow")  # Get selected file
             slot_number = request.form.get("slot_number")  # ✅ Get selected slot_number
+            otp = generate_otp()  # 🔐 Generate OTP
+
 
             # Check if selected slot is available
             cur.execute(
@@ -259,8 +266,8 @@ def users():
             cur.execute(
                 """
             INSERT INTO users 
-            (username, address, phone, to_borrow, slot_number)
-            VALUES (%s, %s, %s, %s, %s)
+            (username, address, phone, to_borrow, slot_number, otp)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """,
                 (
                     username,
@@ -268,6 +275,7 @@ def users():
                     phone,
                     to_borrow,
                     slot_number,
+                    otp,  # Store OTP in the database
                 ),
             )
 
@@ -288,8 +296,7 @@ def users():
                     (file_id, username, datetime.now(), "Borrowed", to_borrow),
                 )
             conn.commit()
-            flash("User created successfully!", "success")
-            return redirect(url_for("users"))
+            return redirect(url_for("users", otp=otp))
 
     # GET method - display users and file options
     cur.execute("SELECT id, username, role FROM users")
@@ -320,6 +327,7 @@ def users():
         users=users,
         file_options=file_options,
         available_slots=available_slots,
+        generated_otp=otp,
     )
 
 
@@ -388,11 +396,12 @@ def files():
         if action == "Create":
             name = request.form["name"]
             file_type = request.form["file_type"]
-            qr_code = generate_qr_code(name)
+            author = request.form.get("author")
+            qr_code = generate_qr_code(name, author, datetime.now())
 
             cur.execute(
-                "INSERT INTO files (name, file_type, qr_code, date_created) VALUES (%s, %s, %s, NOW())",
-                (name, file_type, qr_code),
+                "INSERT INTO files (name, file_type, qr_code, author, date_created) VALUES (%s, %s, %s,%s, NOW())",
+                (name, file_type, qr_code, author),
             )
             conn.commit()
             flash("File created successfully!", "success")
@@ -401,7 +410,7 @@ def files():
             file_id = request.form["file_id"]
             name = request.form["name"]
             file_type = request.form["file_type"]
-            qr_code = generate_qr_code(name)
+            qr_code = generate_qr_code(name, author, datetime.now())
 
             cur.execute(
                 "UPDATE files SET name = %s, file_type = %s, qr_code = %s WHERE id = %s",
@@ -536,7 +545,8 @@ def check_slot(slot_number):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute(
-        "SELECT is_available FROM user_slots WHERE slot_number = %s AND is_available=true", (slot_number,)
+        "SELECT is_available FROM user_slots WHERE slot_number = %s AND is_available=true",
+        (slot_number,),
     )
     result = cur.fetchone()
     cur.close()

@@ -55,6 +55,18 @@
           Manage Users
         </h2>
         <p>Here you can add, edit, and remove users.</p>
+        <br />
+        {% if generated_otp %}
+        <div class="otp-box" id="otpBox">
+          <p><strong>Generated OTP:</strong> {{ generated_otp }}</p>
+          <button
+            onclick="document.getElementById('otpBox').style.display='none'"
+            class="close-btn"
+          >
+            ×
+          </button>
+        </div>
+        {% endif %}
         <!-- Form to Create User -->
         <form action="{{ url_for('users') }}" method="POST" class="create-form">
           <h3>Create New User</h3>
